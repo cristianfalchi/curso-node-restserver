@@ -51,7 +51,6 @@
             })
             .then(resp => resp.json())
             .then(resp => {
-                console.log(resp);
                 // lo guardo para despues poder hacer el signout
                 localStorage.setItem('email', resp.usuario.correo);
             })
