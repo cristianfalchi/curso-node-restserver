@@ -26,7 +26,8 @@ const ProductoSchema = new Schema({
         required: true
     },
     descripcion: {type: String},
-    disponible: {type: Boolean, default: true} // relfeja mas que nada el stock del producto
+    disponible: {type: Boolean, default: true}, // relfeja mas que nada el stock del producto
+    img: {type: String}
 
 })
 
