@@ -5,7 +5,7 @@ class Server {
 
     constructor() {
         this.app = express();
-        this.port = process.env.PORT;
+        this.port = process.env.PORT || 3000;
 
         // El objetivo de que cualquiera que venga a ver mi servidor, entienda que éstas son mis rutas o API
         this.usuariosPath = '/api/usuarios';
