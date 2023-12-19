@@ -1,5 +1,7 @@
 const express = require('express');
-var cors = require('cors');
+const cors = require('cors');
+const { dbConnection } = require('../database/config');
+
 
 class Server {
 
@@ -10,6 +12,9 @@ class Server {
         // El objetivo de que cualquiera que venga a ver mi servidor, entienda que éstas son mis rutas o API
         this.usuariosPath = '/api/usuarios';
 
+        // Antes de los middlewares puedo hacer la conexion a la base de datos
+        this.conectarDb();
+
         // Middlewares (funciones que siempre se ejecutan cuando levantamos nuestro servidor)
         this.middlewares();
 
@@ -17,18 +22,23 @@ class Server {
         this.routes();
     }
 
+    async conectarDb() {
+        await dbConnection();
+
+    }
+
     middlewares() {
 
         // CORS
-        this.app.use( cors() );
+        this.app.use(cors());
 
         // Lectura y Parseo del body
-        this.app.use( express.json() );
+        this.app.use(express.json());
         // Directorio público
         this.app.use(express.static('public'));
     }
 
-    routes(){
+    routes() {
         this.app.use(this.usuariosPath, require('../routes/usuarios'));
     }
 

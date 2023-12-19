@@ -1,12 +1,11 @@
-// Aqui solo creamos funciones y las exportamos
-
-const { response, request } = require('express');
-
+const { response, request } = require('express'); // Aqui solo creamos funciones y las exportamos
+const bcryptjs = require('bcryptjs'); // Para encriptar la contraseña
+const Usuario = require('../models/usuario'); // Para crear instancias de mi modelo Usuario
 
 const usuariosGet = (req = request, res = response) => {
     // los query params express los parsea y me los da en una variable
     // configuramos valores por defecto si no mandan los parametros
-    const {q, nombre = 'no name', apikey, page, limit} = req.query;
+    const { q, nombre = 'no name', apikey, page, limit } = req.query;
 
     res.json({
         msg: "get API - controlador",
@@ -28,17 +27,29 @@ const usuariosPut = (req, res = response) => {
     })
 }
 
-const usuariosPost = (req, res = response) => {
+
+
+
+const usuariosPost = async (req, res = response) => {
 
     // const body = req.body;    
-    const { nombre, edad } = req.body;
+    const { nombre, correo, password, rol } = req.body;
+    const usuario = new Usuario({ nombre, correo, password, rol }); // Creo la instancia de Usuario
+
+    // Encriptar la contraseña
+    const salt = bcryptjs.genSaltSync(/*valor 10  por defecto*/);
+    usuario.password = bcryptjs.hashSync(password, salt);
+
+    // Guardar en DB
+    await usuario.save();
 
     res.json({
-        msg: "post API - controlador",
-        nombre,
-        edad
+        usuario
     })
 }
+
+
+
 
 const usuariosDelete = (req, res = response) => {
     res.json({
