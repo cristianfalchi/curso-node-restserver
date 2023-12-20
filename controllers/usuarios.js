@@ -17,24 +17,34 @@ const usuariosGet = (req = request, res = response) => {
     })
 }
 
-const usuariosPut = (req, res = response) => {
+const usuariosPut = async (req, res = response) => {
     // los parametros express los parsea y me los da en una variable
-    const id = req.params.id;
+
+    const { id } = req.params;
+    const { password, google, ...resto } = req.body; // Voy a extraer todo lo que no necesite grabar si me lo envia
+
+    // TODO validar contra base de datos
+
+    // if (password) {
+    //     // Encriptar la contraseña
+    //     const salt = bcryptjs.genSaltSync(/*valor 10  por defecto*/);
+    //     usuario.password = bcryptjs.hashSync(password, salt);
+    // }
+
+    // const usuario = await Usuario.findByIdAndUpdate(id, resto);
 
     res.json({
-        msg: "put API - controlador",
-        id
+        resto
     })
 }
-
-
 
 
 const usuariosPost = async (req, res = response) => {
 
     // const body = req.body;    
     const { nombre, correo, password, rol } = req.body;
-    const usuario = new Usuario({ nombre, correo, password, rol }); // Creo la instancia de Usuario
+    // Creo la instancia de Usuario
+    const usuario = new Usuario({ nombre, correo, password, rol });
 
     // Encriptar la contraseña
     const salt = bcryptjs.genSaltSync(/*valor 10  por defecto*/);

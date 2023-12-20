@@ -12,13 +12,21 @@ const esRoleValido = async (rol = '') => {
 
 const emailExiste = async (correo = '') => {
     // Verificar el correo si existe
-    const existeEmail = await Usuario.findOne({ correo });
+    const existeEmail = await Usuario.findOne({ correo }); // null sino encuentra nada
     if (existeEmail) {
-        throw new Error(`El correo: ${email} ya existe en la BD`);
+        throw new Error(`El correo ${correo} ya existe en la BD`);
+    }
+}
+
+const passwordsCoinciden = async (value, { req }) => {
+    
+    if (value !== req.body.repeatPassword) {
+        throw new Error('Las contraseñas ingresadas no coinciden');
     }
 }
 
 module.exports = {
     esRoleValido,
-    emailExiste
+    emailExiste,
+    passwordsCoinciden
 }
