@@ -3,7 +3,7 @@ const { Router } = require('express');
 const { check } = require('express-validator'); // el check va preparando los errores en la req
 
 const { validarCampos } = require('../middlewares/validar-campos');
-const { esRoleValido, emailExiste, passwordsCoinciden } = require('../helpers/db-validators');
+const { esRoleValido, emailExiste, passwordsCoinciden, existeUsuarioPorId } = require('../helpers/db-validators');
 
 const { usuariosGet,
   usuariosPut,
@@ -18,7 +18,12 @@ const router = Router();
 // La request y la response estan siendo pasadas como argumentos a usuariosGet
 router.get('/', usuariosGet);
 
-router.put('/:id', usuariosPut);
+router.put('/:id',[
+  check('id', 'No es un id válido').isMongoId(),
+  check('id').custom(existeUsuarioPorId),
+  check('rol').custom(esRoleValido),
+  validarCampos
+], usuariosPut);
 
 router.post('/', [
   // check('rol', 'No es un rol válido').isIn(['ADMIN_ROLE', 'USER_ROL']),
@@ -32,7 +37,11 @@ router.post('/', [
   validarCampos
 ], usuariosPost);
 
-router.delete('/', usuariosDelete);
+router.delete('/:id',[
+  check('id', 'No es un id válido').isMongoId(),
+  check('id').custom(existeUsuarioPorId),
+  validarCampos
+], usuariosDelete);
 
 router.patch('/', usuariosPatch);
 
