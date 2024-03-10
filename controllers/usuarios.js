@@ -2,40 +2,48 @@ const { response, request } = require('express'); // Aqui solo creamos funciones
 const bcryptjs = require('bcryptjs'); // Para encriptar la contraseña
 const Usuario = require('../models/usuario'); // Para crear instancias de mi modelo Usuario
 
-const usuariosGet = (req = request, res = response) => {
-    // los query params express los parsea y me los da en una variable
-    // configuramos valores por defecto si no mandan los parametros
-    const { q, nombre = 'no name', apikey, page, limit } = req.query;
+const usuariosGet = async (req = request, res = response) => {
 
+    // los query params express los parsea y me los da en una variable
+    const { desde = 0, limite = 5 } = req.query; // configuramos valores por defecto si no mandan los parametros
+    const query = { estado: true };
+    // const usuarios = await Usuario.find({estado : true})
+    //     .skip(desde)
+    //     .limit(Number(limite));
+
+    // Cuantos registros tengo en esa coleccion
+    // const total = await Usuario.countDocuments({estado : true});
+
+    const [total, usuarios] = await Promise.all([
+        Usuario.countDocuments(query),
+        Usuario.find(query).skip(desde).limit(Number(limite))
+    ])
+
+    console.log(Number(limite));
     res.json({
-        msg: "get API - controlador",
-        q,
-        nombre,
-        apikey,
-        page,
-        limit
-    })
+        total,
+        usuarios
+    });
 }
 
 const usuariosPut = async (req, res = response) => {
     // los parametros express los parsea y me los da en una variable
 
     const { id } = req.params;
-    const { password, google, ...resto } = req.body; // Voy a extraer todo lo que no necesite grabar si me lo envia
+    const { _id, password, google, correo, ...resto } = req.body; // Voy a extraer todo lo que NO necesite grabar si me lo envia
 
     // TODO validar contra base de datos
 
-    // if (password) {
-    //     // Encriptar la contraseña
-    //     const salt = bcryptjs.genSaltSync(/*valor 10  por defecto*/);
-    //     usuario.password = bcryptjs.hashSync(password, salt);
-    // }
+    if (password) {
+        // Encriptar la contraseña
+        const salt = bcryptjs.genSaltSync(/*valor 10  por defecto*/);
+        resto.password = bcryptjs.hashSync(password, salt);
+    }
 
-    // const usuario = await Usuario.findByIdAndUpdate(id, resto);
+    const usuario = await Usuario.findByIdAndUpdate(id, resto);
 
-    res.json({
-        resto
-    })
+    // Mando unicamente el objeto
+    res.json(usuario);
 }
 
 
@@ -59,12 +67,16 @@ const usuariosPost = async (req, res = response) => {
 }
 
 
+const usuariosDelete = async (req, res = response) => {
 
+    const { id } = req.params;
 
-const usuariosDelete = (req, res = response) => {
-    res.json({
-        msg: "delete API - controlador"
-    })
+    // Fisicamente lo borramos
+    // const usuario = await Usuario.findByIdAndDelete(id);
+
+    const usuario = await Usuario.findByIdAndUpdate(id, { estado: false });
+
+    res.json(usuario);
 }
 
 const usuariosPatch = (req, res = response) => {

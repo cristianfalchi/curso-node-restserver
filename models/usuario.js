@@ -42,8 +42,9 @@
  // Podemos sobrescribir metodos de mongoose
  // cuando se manda a ejecutar el toJSON va a ejecutar esta funcion
  UsuarioSchema.methods.toJSON = function() {
-    const {__v, password, ...usuario} = this.toObject();
-    return usuario;
+    const {_id, __v, password, ...usuario} = this.toObject();
+    // usuario.uid = _id;
+    return {uid:_id, ...usuario};
  }
 
 
